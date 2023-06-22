@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "18272534744",
+    "project_id": "itsanotetaking-flutter-proj",
+    "storage_bucket": "itsanotetaking-flutter-proj.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:18272534744:android:bf24d86266b2399b8497ad",
+        "android_client_info": {
+          "package_name": "com.appsandroidfortesting.takemynotes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "18272534744-9h2c49namhl9a0sjmsbqsjootas46gie.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkn5IV6F3uV34EDL1BrLqsRx1f3G_FEng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "18272534744-9h2c49namhl9a0sjmsbqsjootas46gie.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
