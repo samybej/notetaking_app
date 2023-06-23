@@ -123,7 +123,7 @@ Future<bool> showLogOutDialog(BuildContext context) {
               child: const Text('Cancel')),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(true);
+              Navigator.of(context).pop(true); // pop the dialog and return true
             },
             child: const Text('Logout'),
           ),
