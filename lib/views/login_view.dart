@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -55,16 +56,20 @@ class _LoginViewState extends State<LoginView> {
                   final userCredential = await FirebaseAuth.instance
                       .signInWithEmailAndPassword(
                           email: email, password: password);
-                  print(userCredential);
+                  devtools.log(userCredential.toString());
+                  if (context.mounted) {
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil('/notes/', (route) => false);
+                  }
                 } on FirebaseAuthException catch (e) {
-                  print("an error occured when logging in.");
-                  print(e
-                      .runtimeType); //type of exception , this allows us to chose the correct exception type on the catch clause above
+                  devtools.log("an error occured when logging in.");
+                  devtools.log(e.runtimeType
+                      .toString()); //type of exception , this allows us to chose the correct exception type on the catch clause above
                   //In our case, the exception was of type FirebaseAuthException!
-                  print(e);
-                  print(e.code); //reason for exception
+                  devtools.log(e.toString());
+                  devtools.log(e.code); //reason for exception
                   if (e.code == 'wrong-password') {
-                    print('Wrong Password !');
+                    devtools.log('Wrong Password !');
                   }
                 }
               },
