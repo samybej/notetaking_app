@@ -57,13 +57,18 @@ class _LoginViewState extends State<LoginView> {
                 final email = _email.text;
                 final password = _password.text;
                 try {
-                  final userCredential = await FirebaseAuth.instance
-                      .signInWithEmailAndPassword(
-                          email: email, password: password);
-                  devtools.log(userCredential.toString());
+                  await FirebaseAuth.instance.signInWithEmailAndPassword(
+                      email: email, password: password);
+
+                  final currentUser = FirebaseAuth.instance.currentUser;
                   if (context.mounted) {
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil(notesRoute, (route) => false);
+                    if (currentUser?.emailVerified ?? false) {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          notesRoute, (route) => false);
+                    } else {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          verifyRoute, (route) => false);
+                    }
                   }
                 } on FirebaseAuthException catch (e) {
                   devtools.log("an error occured when logging in.");
