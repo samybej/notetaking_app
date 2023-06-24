@@ -1,5 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:takemynotes/services/auth/auth_service.dart';
+import 'package:takemynotes/services/crud/notes_service.dart';
 
 import '../constants/routes.dart';
 import '../enums/menu_action.dart';
@@ -13,6 +15,24 @@ class NoteTakingView extends StatefulWidget {
 }
 
 class _NoteTakingViewState extends State<NoteTakingView> {
+  late final NotesService _notesService;
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+
+  @override
+  void initState() {
+    _notesService =
+        NotesService(); //this calls the factory declared in notes_service to call the singleton
+    _notesService
+        .open(); //open the database and create the local cache for our notes
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _notesService.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +66,28 @@ class _NoteTakingViewState extends State<NoteTakingView> {
           )
         ],
       ),
-      body: const Text('These are my notes...'),
+      body: FutureBuilder(
+        future: _notesService.getOrCreateUser(email: userEmail),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              return StreamBuilder(
+                stream: _notesService.allNotes,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState
+                          .waiting: // we shouldn't hook a 'done' state for a stream
+                      return const Text('waiting for all notes');
+                    default:
+                      return const CircularProgressIndicator();
+                  }
+                },
+              );
+            default:
+              return const CircularProgressIndicator();
+          }
+        },
+      ),
     );
   }
 }
