@@ -8,42 +8,24 @@ import 'package:path/path.dart' show join;
 
 import 'crud_exceptions.dart';
 
-const idColumn = 'id';
-const emailColumn = 'email';
-const userIdColumn = 'user_id';
-const textColumn = 'text';
-const dbName = 'notes.db';
-const noteTable = 'note';
-const userTable = 'user';
-
-const createUserTable = ''' CREATE TABLE IF NOT EXISTS "user" (
-	"id"	INTEGER NOT NULL,
-	"email"	TEXT NOT NULL UNIQUE,
-	PRIMARY KEY("id" AUTOINCREMENT)
-); ''';
-
-const createNoteTable = '''
-CREATE TABLE IF NOT EXISTS "note" (
-	"id"	INTEGER NOT NULL,
-	"user_id"	INTEGER NOT NULL,
-	"text"	TEXT,
-	FOREIGN KEY("user_id") REFERENCES "user"("id"),
-	PRIMARY KEY("id" AUTOINCREMENT)
-); ''';
-
 class NotesService {
   Database? _db;
 
   List<DatabaseNote> _notes =
       []; //this is our cache where we keep all of our notes (for the current user).
   static final NotesService _shared = NotesService._sharedInstance();
-  NotesService._sharedInstance();
+  NotesService._sharedInstance() {
+    _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(
+      onListen: () {
+        _notesStreamController.sink.add(_notes);
+      },
+    );
+  }
   factory NotesService() =>
       _shared; //these 3 steps help create a singleton for our noteService
 
-  final _notesStreamController = StreamController<
-      List<
-          DatabaseNote>>.broadcast(); // the UI is going to interact with this controller
+  late final StreamController<List<DatabaseNote>>
+      _notesStreamController; // the UI is going to interact with this controller
 
   Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
 
@@ -82,6 +64,7 @@ class NotesService {
 
   Future<DatabaseUser> getUser({required String email}) async {
     await _ensureDatabaseOpen();
+
     final db = _getDatabaseOrThrow();
     final results = await db.query(userTable,
         limit: 1, where: 'email = ?', whereArgs: [email.toLowerCase()]);
@@ -105,13 +88,14 @@ class NotesService {
 
   Future<DatabaseNote> createNote({required DatabaseUser user}) async {
     await _ensureDatabaseOpen();
+
     final db = _getDatabaseOrThrow();
     final result = await getUser(email: user.email);
 
     if (result != user) {
       throw CouldNotFindUser();
     } else {
-      const text = ' ';
+      const text = '';
       final noteId =
           await db.insert(noteTable, {userIdColumn: user.id, textColumn: text});
 
@@ -145,11 +129,7 @@ class NotesService {
     final db = _getDatabaseOrThrow();
     final notes = await db.query(noteTable);
 
-    if (notes.isEmpty) {
-      throw NoteNotFound();
-    } else {
-      return notes.map((noteRow) => DatabaseNote.fromRow(noteRow));
-    }
+    return notes.map((noteRow) => DatabaseNote.fromRow(noteRow));
   }
 
   Future<DatabaseNote> updateNote(
@@ -160,7 +140,7 @@ class NotesService {
 
     final updatedCount = await db.update(noteTable, {textColumn: text});
 
-    if (updatedCount != 1) {
+    if (updatedCount == 0) {
       throw NoteNotUpdated();
     } else {
       final updatedNote =
@@ -257,6 +237,12 @@ class DatabaseUser {
   String toString() {
     return 'ID = $id, email = $email';
   }
+
+  @override
+  bool operator ==(covariant DatabaseUser other) => id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 @immutable
@@ -284,3 +270,26 @@ class DatabaseNote {
   @override
   int get hashCode => id.hashCode;
 }
+
+const idColumn = 'id';
+const emailColumn = 'email';
+const userIdColumn = 'user_id';
+const textColumn = 'text';
+const dbName = 'notes.db';
+const noteTable = 'note';
+const userTable = 'user';
+
+const createUserTable = ''' CREATE TABLE IF NOT EXISTS "user" (
+	"id"	INTEGER NOT NULL,
+	"email"	TEXT NOT NULL UNIQUE,
+	PRIMARY KEY("id" AUTOINCREMENT)
+); ''';
+
+const createNoteTable = '''
+CREATE TABLE IF NOT EXISTS "note" (
+	"id"	INTEGER NOT NULL,
+	"user_id"	INTEGER NOT NULL,
+	"text"	TEXT,
+	FOREIGN KEY("user_id") REFERENCES "user"("id"),
+	PRIMARY KEY("id" AUTOINCREMENT)
+); ''';

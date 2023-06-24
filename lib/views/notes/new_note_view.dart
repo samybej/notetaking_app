@@ -28,6 +28,7 @@ class _NewNoteViewState extends State<NewNoteView> {
       return;
     }
     final text = _textController.text;
+
     await _notesService.updateNote(note: note, text: text);
   }
 
@@ -43,6 +44,7 @@ class _NewNoteViewState extends State<NewNoteView> {
     _deleteNoteIfTextIsEmpty();
     _saveNoteIfNotEmpty();
     _textController.dispose();
+
     super.dispose();
   }
 
@@ -54,7 +56,6 @@ class _NewNoteViewState extends State<NewNoteView> {
     final currentUser = AuthService.firebase().currentUser!;
     final email = currentUser.email!;
     final owner = await _notesService.getUser(email: email);
-
     return await _notesService.createNote(user: owner);
   }
 
@@ -67,6 +68,7 @@ class _NewNoteViewState extends State<NewNoteView> {
 
   void _saveNoteIfNotEmpty() async {
     final note = _note;
+
     if (_textController.text.isNotEmpty && note != null) {
       await _notesService.updateNote(note: note, text: _textController.text);
     }
@@ -82,6 +84,7 @@ class _NewNoteViewState extends State<NewNoteView> {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
               _note = snapshot.data;
+
               _setupTextControllerListener();
               return TextField(
                 controller: _textController,

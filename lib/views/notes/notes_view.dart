@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:takemynotes/services/auth/auth_service.dart';
 import 'package:takemynotes/services/crud/notes_service.dart';
 
@@ -29,7 +30,8 @@ class _NoteTakingViewState extends State<NoteTakingView> {
 
   @override
   void dispose() {
-    _notesService.close();
+    //_notesService.close();
+    // we shouldn't close the db otherwise after each hot reload it gets closed
     super.dispose();
   }
 
@@ -83,10 +85,28 @@ class _NoteTakingViewState extends State<NoteTakingView> {
                   switch (snapshot.connectionState) {
                     case ConnectionState
                           .waiting: // we shouldn't hook a 'done' state for a stream
-                      return const Text('waiting for all notes');
                     case ConnectionState
                           .active: // we shouldn't hook a 'done' state for a stream
+                      if (snapshot.hasData) {
+                        final allNotes = snapshot.data as List<DatabaseNote>;
 
+                        return ListView.builder(
+                          itemCount: allNotes.length,
+                          itemBuilder: (context, index) {
+                            final currentNote = allNotes[index];
+                            return ListTile(
+                              title: Text(
+                                currentNote.text,
+                                maxLines: 1,
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return const CircularProgressIndicator();
+                      }
                     default:
                       return const CircularProgressIndicator();
                   }
