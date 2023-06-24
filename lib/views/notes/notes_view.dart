@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:takemynotes/services/auth/auth_service.dart';
 import 'package:takemynotes/services/crud/notes_service.dart';
 
-import '../constants/routes.dart';
-import '../enums/menu_action.dart';
-import '../utilities/logout_dialog.dart';
+import '../../constants/routes.dart';
+import '../../enums/menu_action.dart';
+import '../../utilities/logout_dialog.dart';
 
 class NoteTakingView extends StatefulWidget {
   const NoteTakingView({super.key});
@@ -39,6 +39,12 @@ class _NoteTakingViewState extends State<NoteTakingView> {
       appBar: AppBar(
         title: const Text('Notes Page'),
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(newNoteRoute);
+            },
+            icon: const Icon(Icons.add),
+          ),
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
               switch (value) {
