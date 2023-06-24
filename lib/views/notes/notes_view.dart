@@ -84,6 +84,9 @@ class _NoteTakingViewState extends State<NoteTakingView> {
                     case ConnectionState
                           .waiting: // we shouldn't hook a 'done' state for a stream
                       return const Text('waiting for all notes');
+                    case ConnectionState
+                          .active: // we shouldn't hook a 'done' state for a stream
+
                     default:
                       return const CircularProgressIndicator();
                   }

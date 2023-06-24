@@ -111,7 +111,7 @@ class NotesService {
     if (result != user) {
       throw CouldNotFindUser();
     } else {
-      const text = '';
+      const text = ' ';
       final noteId =
           await db.insert(noteTable, {userIdColumn: user.id, textColumn: text});
 
