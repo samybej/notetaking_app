@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:takemynotes/constants/routes.dart';
 import 'package:takemynotes/services/auth/auth_service.dart';
 import 'package:takemynotes/views/login_view.dart';

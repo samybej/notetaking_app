@@ -1,6 +1,5 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:takemynotes/services/auth/auth_service.dart';
 import 'package:takemynotes/services/crud/notes_service.dart';
 import 'package:takemynotes/views/notes/notes_list_view.dart';
@@ -18,7 +17,7 @@ class NoteTakingView extends StatefulWidget {
 
 class _NoteTakingViewState extends State<NoteTakingView> {
   late final NotesService _notesService;
-  String get userEmail => AuthService.firebase().currentUser!.email!;
+  String get userEmail => AuthService.firebase().currentUser!.email;
 
   @override
   void initState() {

@@ -242,6 +242,7 @@ class NotesService {
   }
 }
 
+// Local Database User !
 @immutable
 class DatabaseUser {
   final int id;
@@ -265,6 +266,7 @@ class DatabaseUser {
   int get hashCode => id.hashCode;
 }
 
+// Local Database Note !
 @immutable
 class DatabaseNote {
   final int id;
