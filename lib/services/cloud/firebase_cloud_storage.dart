@@ -1,17 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:takemynotes/services/cloud/cloud_note.dart';
 import 'package:takemynotes/services/cloud/cloud_storage_exceptions.dart';
-import 'package:takemynotes/services/crud/notes_service.dart';
+
+import 'cloud_storage_constants.dart';
 
 class FirebaseCloudStorage {
   final notes = FirebaseFirestore.instance.collection('notes');
 
-  void createNewNote({required String userId}) async {
+  Future<CloudNote> createNewNote({required String userId}) async {
     //a Document reference is like a stream but it's read AND write !
-    await notes.add({
+    final document = await notes.add({
       userIdColumn: userId,
       textColumn: '',
     });
+
+    final note = await document.get();
+    return CloudNote(documentId: note.id, userId: userIdColumn, text: '');
   }
 
   Future<void> updateNote({required String id, required String text}) async {
@@ -46,10 +50,7 @@ class FirebaseCloudStorage {
           .where(userIdColumn, isEqualTo: userId)
           .get()
           .then((value) => value.docs.map((doc) {
-                return CloudNote(
-                    documentId: doc.id,
-                    userId: doc.data()[userIdColumn],
-                    text: doc.data()[textColumn]);
+                return CloudNote.fromSnapshot(doc);
               }));
     } catch (e) {
       throw CouldNotGetAllNotesException();

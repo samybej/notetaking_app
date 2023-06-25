@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-
-import '../../services/crud/notes_service.dart';
+import 'package:takemynotes/services/cloud/cloud_note.dart';
 import '../../utilities/dialogs/delete_dialog.dart';
 
-typedef NoteCallback = void Function(DatabaseNote note);
+typedef NoteCallback = void Function(CloudNote note);
 
 class NotesListView extends StatelessWidget {
-  final List<DatabaseNote> notes;
+  //Firebase by default works with iterables and not lists
+  final Iterable<CloudNote> notes;
   final NoteCallback onDeleteNote;
   final NoteCallback onTapNote;
 
@@ -21,9 +21,7 @@ class NotesListView extends StatelessWidget {
     return ListView.builder(
       itemCount: notes.length,
       itemBuilder: (context, index) {
-        final currentNote = notes[index];
-        print('this is the current index : $index');
-        print('this is the current note : $currentNote');
+        final currentNote = notes.elementAt(index);
         return ListTile(
           title: Text(
             currentNote.text,
