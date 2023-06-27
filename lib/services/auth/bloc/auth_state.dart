@@ -20,18 +20,22 @@ class AuthStateLoggedIn extends AuthState {
 }
 
 //failure state (exception)
-class AuthStateLoginFailure extends AuthState {
+//this state is not necessary
+//In case the login fails -> we are STILL in the state of Logout !
+/*class AuthStateLoginFailure extends AuthState {
   final Exception exception;
 
   const AuthStateLoginFailure(this.exception);
 }
+*/
 
 class AuthStateNotVerified extends AuthState {
   const AuthStateNotVerified();
 }
 
 class AuthStateLoggedOut extends AuthState {
-  const AuthStateLoggedOut();
+  final Exception? exception;
+  const AuthStateLoggedOut(this.exception);
 }
 
 //failure state (exception)

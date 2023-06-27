@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:takemynotes/services/auth/auth_provider.dart';
-import 'package:takemynotes/services/auth/auth_user.dart';
 import 'package:takemynotes/services/auth/bloc/auth_event.dart';
 import 'package:takemynotes/services/auth/bloc/auth_state.dart';
 
@@ -12,7 +11,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final user = provider.currentUser;
 
         if (user == null) {
-          emit(const AuthStateLoggedOut());
+          emit(const AuthStateLoggedOut(null));
         } else if (user.isEmailVerified == false) {
           emit(const AuthStateNotVerified());
         } else {
@@ -23,8 +22,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<AuthEventLogIn>(
       (event, emit) async {
-        emit(const AuthStateLoading());
-
         final email = event.email;
         final password = event.password;
 
@@ -34,7 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           emit(AuthStateLoggedIn(user));
           //we need to add 'on Exception' because in dart 'e' can be any type
         } on Exception catch (e) {
-          emit(AuthStateLoginFailure(e));
+          emit(AuthStateLoggedOut(e));
         }
       },
     );
@@ -45,7 +42,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
         try {
           await provider.logOut();
-          emit(const AuthStateLoggedOut());
+          emit(const AuthStateLoggedOut(null));
         } on Exception catch (e) {
           emit(AuthStateLogoutFailure(e));
         }
