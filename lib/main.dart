@@ -1,8 +1,10 @@
-import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:takemynotes/constants/routes.dart';
-import 'package:takemynotes/services/auth/auth_service.dart';
+import 'package:takemynotes/services/auth/bloc/auth_bloc.dart';
+import 'package:takemynotes/services/auth/bloc/auth_event.dart';
+import 'package:takemynotes/services/auth/bloc/auth_state.dart';
+import 'package:takemynotes/services/auth/firebase_auth_provider.dart';
 import 'package:takemynotes/views/login_view.dart';
 import 'package:takemynotes/views/notes/create_update_note_view.dart';
 import 'package:takemynotes/views/notes/notes_view.dart';
@@ -18,7 +20,10 @@ void main() {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: BlocProvider<AuthBloc>(
+        create: (context) => AuthBloc(FirebaseAuthProvider()),
+        child: const HomePage(),
+      ),
       routes: {
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
@@ -29,13 +34,29 @@ void main() {
     ),
   );
 }
-/*
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    context.read<AuthBloc>().add(const AuthEventInitialize());
+
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state is AuthStateLoggedIn) {
+          return const NoteTakingView();
+        } else if (state is AuthStateNotVerified) {
+          return const VerifyEmailView();
+        } else if (state is AuthStateLoggedOut) {
+          return const LoginView();
+        } else {
+          return const Scaffold(body: CircularProgressIndicator());
+        }
+      },
+    );
+
+    /* return FutureBuilder(
       future: AuthService.firebase().initialize(),
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
@@ -54,11 +75,12 @@ class HomePage extends StatelessWidget {
             return const CircularProgressIndicator(); //if internet connection is slow this is the first thing that appears before the user/email column
         }
       },
-    );
+    );*/
   }
 }
-*/
 
+
+/*
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -200,3 +222,5 @@ class CounterBloc extends Bloc<CounterEvent, CounterState> {
     }));
   }
 }
+
+*/

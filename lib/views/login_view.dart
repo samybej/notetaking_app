@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:takemynotes/constants/routes.dart';
 import 'package:takemynotes/services/auth/auth_exceptions.dart';
-import 'package:takemynotes/services/auth/auth_service.dart';
+import 'package:takemynotes/services/auth/bloc/auth_bloc.dart';
+import 'package:takemynotes/services/auth/bloc/auth_event.dart';
 
 import '../utilities/dialogs/error_dialog.dart';
 
@@ -56,7 +58,8 @@ class _LoginViewState extends State<LoginView> {
                 final email = _email.text;
                 final password = _password.text;
                 try {
-                  await AuthService.firebase()
+                  context.read<AuthBloc>().add(AuthEventLogIn(email, password));
+                  /*await AuthService.firebase()
                       .logIn(email: email, password: password);
 
                   final currentUser = AuthService.firebase().currentUser;
@@ -64,11 +67,13 @@ class _LoginViewState extends State<LoginView> {
                     if (currentUser?.isEmailVerified ?? false) {
                       Navigator.of(context).pushNamedAndRemoveUntil(
                           notesRoute, (route) => false);
+                          
                     } else {
                       Navigator.of(context).pushNamedAndRemoveUntil(
                           verifyRoute, (route) => false);
                     }
                   }
+                  */
                 } on UserNotFoundAuthException {
                   await showErrorDialog(context, 'User not found');
                 } on WrongPasswordAuthException {
