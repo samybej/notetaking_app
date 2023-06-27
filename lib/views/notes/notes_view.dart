@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:takemynotes/services/auth/auth_service.dart';
 import 'package:takemynotes/services/auth/bloc/auth_event.dart';
-import 'package:takemynotes/services/auth/bloc/auth_state.dart';
 import 'package:takemynotes/services/cloud/cloud_note.dart';
 import 'package:takemynotes/services/cloud/firebase_cloud_storage.dart';
 import 'package:takemynotes/views/notes/notes_list_view.dart';
