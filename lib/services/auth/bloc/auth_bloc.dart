@@ -4,7 +4,8 @@ import 'package:takemynotes/services/auth/bloc/auth_event.dart';
 import 'package:takemynotes/services/auth/bloc/auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc(AuthProvider provider) : super(const AuthStateOnInitialized()) {
+  AuthBloc(AuthProvider provider)
+      : super(const AuthStateOnInitialized(isLoading: true)) {
     on<AuthEventSendEmailVerification>(
       (event, emit) async {
         await provider.sendEmailVerification();
@@ -19,9 +20,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (user == null) {
           emit(const AuthStateLoggedOut(exception: null, isLoading: false));
         } else if (user.isEmailVerified == false) {
-          emit(const AuthStateNotVerified());
+          emit(const AuthStateNotVerified(isLoading: false));
         } else {
-          emit(AuthStateLoggedIn(user));
+          emit(AuthStateLoggedIn(authUser: user, isLoading: false));
         }
       },
     );
@@ -35,9 +36,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await provider.createUser(email: email, password: password);
 
           await provider.sendEmailVerification();
-          emit(const AuthStateNotVerified());
+          emit(const AuthStateNotVerified(isLoading: false));
         } on Exception catch (e) {
-          emit(AuthStateRegistering(e));
+          emit(AuthStateRegistering(exception: e, isLoading: false));
         }
       },
     );
@@ -54,11 +55,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           if (user.isEmailVerified == false) {
             emit(const AuthStateLoggedOut(exception: null, isLoading: false));
 
-            emit(const AuthStateNotVerified());
+            emit(const AuthStateNotVerified(isLoading: false));
           } else {
             emit(const AuthStateLoggedOut(exception: null, isLoading: false));
 
-            emit(AuthStateLoggedIn(user));
+            emit(AuthStateLoggedIn(authUser: user, isLoading: false));
           }
 
           //we need to add 'on Exception' because in dart 'e' can be any type
@@ -70,7 +71,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     on<AuthEventLogout>(
       (event, emit) async {
-        emit(const AuthStateLoggedOut(exception: null, isLoading: true));
+        emit(const AuthStateLoggedOut(
+            exception: null,
+            isLoading: true,
+            loadingText: 'Please wait while we log you in'));
         try {
           await provider.logOut();
           emit(const AuthStateLoggedOut(exception: null, isLoading: false));

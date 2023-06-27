@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:takemynotes/constants/routes.dart';
 import 'package:takemynotes/services/auth/auth_exceptions.dart';
 import 'package:takemynotes/services/auth/bloc/auth_bloc.dart';
 import 'package:takemynotes/services/auth/bloc/auth_event.dart';
@@ -20,7 +19,6 @@ class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
 
-  CloseDialog? _closeDialog;
   @override
   void initState() {
     _email = TextEditingController();
@@ -41,15 +39,6 @@ class _LoginViewState extends State<LoginView> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthStateLoggedOut) {
-          final closeDialog = _closeDialog;
-
-          if (state.isLoading == false && closeDialog != null) {
-            closeDialog();
-            _closeDialog = null;
-          } else if (state.isLoading && closeDialog == null) {
-            _closeDialog = showLoadingDialog(context: context, text: 'Loading');
-          }
-
           if (state.exception is UserNotFoundAuthException ||
               state.exception is WrongPasswordAuthException) {
             await showErrorDialog(context, 'Wrong credentials');
