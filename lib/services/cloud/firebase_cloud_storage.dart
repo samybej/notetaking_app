@@ -39,12 +39,14 @@ class FirebaseCloudStorage {
 //for that reason, we need to subscribe to the snapshots(), all those changes happen inside a list of 'querySnapShots'
 //Each query snapshot contains a list of documents
 //Collection -> snapshots -> documents
-  Stream<Iterable<CloudNote>> allNotes({required String ownerUserId}) =>
-      notes.snapshots().map((event) => event.docs
-          .map((doc) => CloudNote.fromSnapshot(doc))
-          .where((note) => note.userId == ownerUserId));
+  Stream<Iterable<CloudNote>> allNotes({required String ownerUserId}) {
+    return notes
+        .where(userIdColumn, isEqualTo: ownerUserId)
+        .snapshots()
+        .map((event) => event.docs.map((doc) => CloudNote.fromSnapshot(doc)));
+  }
 
-  Future<Iterable<CloudNote>> getNotes({required String userId}) async {
+  /* Future<Iterable<CloudNote>> getNotes({required String userId}) async {
     try {
       return await notes
           .where(userIdColumn, isEqualTo: userId)
@@ -56,7 +58,7 @@ class FirebaseCloudStorage {
       throw CouldNotGetAllNotesException();
     }
   }
-
+  */
   //creating a Singleton
   static final FirebaseCloudStorage _shared =
       FirebaseCloudStorage._sharedInstance();
